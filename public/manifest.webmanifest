@@ -1,0 +1,16 @@
+{
+  "name": "The Daily Execution System",
+  "short_name": "Execution",
+  "description": "Ruthless focus, unforgiving consistency, minimalist metrics. Habits, micro-actions, focus timer, journal and wellness in one dark, developer-grade tracker.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#080b11",
+  "theme_color": "#080b11",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" },
+    { "src": "/favicon.svg", "sizes": "64x64", "type": "image/svg+xml" }
+  ],
+  "categories": ["productivity", "health", "lifestyle"]
+}
