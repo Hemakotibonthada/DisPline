@@ -181,7 +181,7 @@ export function updateAccount(id, patch) {
   const accounts = listAccounts();
   const idx = accounts.findIndex((a) => a.id === id);
   if (idx === -1) return;
-  const allowed = ['name', 'avatarColor'];
+  const allowed = ['name', 'avatarColor', 'avatarUrl'];
   for (const key of allowed) if (patch[key] !== undefined) accounts[idx][key] = patch[key];
   saveAccounts(accounts);
 }

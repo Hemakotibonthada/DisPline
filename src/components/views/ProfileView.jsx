@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AVATAR_COLORS, REWARDS, THEMES } from '../../store/defaults.js';
 import { useStore } from '../../store/StoreContext.jsx';
-
-const initials = (name) => name?.trim()?.[0]?.toUpperCase() || 'U';
+import Avatar from '../common/Avatar.jsx';
+import { resizeImageToDataUrl } from '../../lib/image.js';
 
 export default function ProfileView() {
   const { state, actions, user } = useStore();
@@ -11,6 +11,10 @@ export default function ProfileView() {
   const [name, setName] = useState(user.name || '');
   const [avatarColor, setAvatarColor] = useState(user.avatarColor || AVATAR_COLORS[0]);
   const [bio, setBio] = useState(state.profile?.bio || '');
+  const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl || '');
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const [photoError, setPhotoError] = useState('');
+  const fileRef = useRef(null);
 
   const unlockedTitles = state.gamification.titles || [];
   const unlockedThemes = state.gamification.unlockedThemes || [];
@@ -22,7 +26,8 @@ export default function ProfileView() {
   useEffect(() => {
     setName(user.name || '');
     setAvatarColor(user.avatarColor || AVATAR_COLORS[0]);
-  }, [user.name, user.avatarColor]);
+    setAvatarUrl(user.avatarUrl || '');
+  }, [user.name, user.avatarColor, user.avatarUrl]);
 
   useEffect(() => {
     setBio(state.profile?.bio || '');
@@ -31,9 +36,32 @@ export default function ProfileView() {
   const saveProfile = (event) => {
     event.preventDefault();
     const nextName = name.trim() || user.name || 'Operator';
-    actions.updateProfile(nextName, avatarColor);
+    actions.updateProfile(nextName, avatarColor, avatarUrl);
     actions.setBio(bio);
     setName(nextName);
+  };
+
+  const onPickPhoto = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    setPhotoError('');
+    setPhotoBusy(true);
+    try {
+      const url = await resizeImageToDataUrl(file, 256, 0.85);
+      setAvatarUrl(url);
+      actions.updateProfile(name.trim() || user.name, avatarColor, url);
+    } catch (err) {
+      setPhotoError(err.message || 'Could not use that image.');
+    } finally {
+      setPhotoBusy(false);
+    }
+  };
+
+  const onRemovePhoto = () => {
+    setAvatarUrl('');
+    setPhotoError('');
+    actions.updateProfile(name.trim() || user.name, avatarColor, '');
   };
 
   const exportData = () => {
@@ -101,14 +129,20 @@ export default function ProfileView() {
             <div className="grid g2" style={{ alignItems: 'start' }}>
               <div className="stack">
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                  <div className="avatar lg" style={{ background: avatarColor }}>
-                    {initials(name || user.name)}
-                  </div>
-                  <div>
+                  <Avatar user={{ name: name || user.name, avatarColor, avatarUrl }} size={64} />
+                  <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: 15, fontWeight: 800 }}>{name || user.name}</div>
                     <div style={{ color: 'var(--text-faint)', fontSize: 12 }}>
                       Member since {new Date(user.createdAt).toLocaleDateString()}
                     </div>
+                    <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
+                      <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPickPhoto} />
+                      <button type="button" className="btn sm" onClick={() => fileRef.current?.click()} disabled={photoBusy}>
+                        {photoBusy ? 'Uploading…' : avatarUrl ? '📷 Change photo' : '📷 Upload photo'}
+                      </button>
+                      {avatarUrl ? <button type="button" className="btn sm ghost" onClick={onRemovePhoto}>Remove</button> : null}
+                    </div>
+                    {photoError ? <div style={{ color: 'var(--red-bright)', fontSize: 11, marginTop: 6 }}>{photoError}</div> : null}
                   </div>
                 </div>
 

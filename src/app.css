@@ -158,6 +158,8 @@ textarea.input { resize: vertical; min-height: 84px; line-height: 1.5; }
 .avatar:hover { border-color: rgba(255,255,255,0.3); }
 .avatar.sm { width: 30px; height: 30px; font-size: 12px; }
 .avatar.lg { width: 64px; height: 64px; font-size: 24px; }
+.avatar.has-img { background: transparent; padding: 0; overflow: hidden; color: transparent; }
+.avatar.has-img img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
 
 .view { padding: clamp(16px, 2.2vw, 28px); max-width: 1180px; margin: 0 auto; width: 100%; animation: fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) both; }
 

@@ -35,6 +35,13 @@ const relativeTime = (value) => {
 };
 
 function Avatar({ user, size = '' }) {
+  if (user?.avatarUrl) {
+    return (
+      <div className={`avatar has-img ${size}`.trim()}>
+        <img src={user.avatarUrl} alt={user?.name || 'avatar'} />
+      </div>
+    );
+  }
   return (
     <div className={`avatar ${size}`.trim()} style={{ background: user?.avatarColor || 'var(--brand)' }}>
       {initials(user)}

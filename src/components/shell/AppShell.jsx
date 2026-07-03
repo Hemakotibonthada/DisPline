@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useStore } from '../../store/StoreContext.jsx';
 import CommandPalette from '../common/CommandPalette.jsx';
 import Confetti from '../common/Confetti.jsx';
+import Avatar from '../common/Avatar.jsx';
 import { useInstallPrompt } from '../../lib/useInstallPrompt.js';
 import { playLevelUp, playPop } from '../../lib/sfx.js';
 import TodayView from '../views/TodayView.jsx';
@@ -105,8 +106,6 @@ export default function AppShell() {
 
   const go = (id) => { setView(id); window.scrollTo({ top: 0, behavior: 'smooth' }); };
 
-  const initial = (user.name || '?')[0].toUpperCase();
-
   return (
     <div className="shell">
       <aside className="sidebar">
@@ -128,7 +127,7 @@ export default function AppShell() {
         </nav>
         <div className="sidebar-foot">
           <button className="nav-item" onClick={() => go('profile')}>
-            <span className="avatar sm" style={{ background: user.avatarColor }}>{initial}</span>
+            <Avatar user={user} size={30} />
             <span style={{ minWidth: 0, overflow: 'hidden' }}>
               <span style={{ display: 'block', fontSize: 12.5, fontWeight: 700, whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{user.name}</span>
               <span style={{ fontSize: 10, color: 'var(--text-faint)' }}>{state.gamification.activeTitle}</span>
@@ -172,7 +171,7 @@ export default function AppShell() {
             🔔
             {unread ? <span className="notif-badge num">{unread}</span> : null}
           </button>
-          <button className="avatar" style={{ background: user.avatarColor }} onClick={() => go('profile')} aria-label="Profile">{initial}</button>
+          <button onClick={() => go('profile')} aria-label="Profile" style={{ border: 'none', background: 'none', padding: 0, cursor: 'pointer', flex: 'none' }}><Avatar user={user} size={40} /></button>
 
           {notifOpen && (
             <div className="notif-panel panel">

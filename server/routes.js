@@ -22,11 +22,19 @@ function publicUser(user) {
     name: user.name,
     username: user.username,
     avatarColor: user.avatarColor,
+    avatarUrl: user.avatarUrl || null,
   };
 }
 
 function selfUser(user) {
-  return { ...publicUser(user), email: user.email };
+  return { ...publicUser(user), email: user.email, createdAt: user.createdAt };
+}
+
+function cleanAvatarUrl(value) {
+  if (typeof value !== 'string' || !value) return '';
+  if (!/^data:image\/(png|jpeg|jpg|webp|gif);base64,/.test(value)) return '';
+  if (value.length > 500000) return ''; // ~375KB image cap
+  return value;
 }
 
 function normalizeIdentifier(identifier) {
@@ -71,6 +79,7 @@ router.post('/auth/register', asyncHandler(async (req, res) => {
   const email = String(req.body?.email || '').trim().toLowerCase();
   const password = String(req.body?.password || '');
   const avatarColor = String(req.body?.avatarColor || '#34d399').trim() || '#34d399';
+  const avatarUrl = cleanAvatarUrl(req.body?.avatarUrl);
 
   if (!name) return res.status(400).json({ error: 'Name is required' });
   if (username.length < 3 || username.length > 20 || !usernamePattern.test(username)) {
@@ -89,6 +98,7 @@ router.post('/auth/register', asyncHandler(async (req, res) => {
     email,
     passwordHash: await bcrypt.hash(password, 10),
     avatarColor,
+    avatarUrl,
     createdAt: new Date().toISOString(),
   };
   db.users.push(user);
@@ -128,6 +138,9 @@ router.patch('/auth/profile', authMiddleware, asyncHandler(async (req, res) => {
     const avatarColor = String(req.body.avatarColor || '').trim();
     if (!avatarColor) return res.status(400).json({ error: 'Avatar color cannot be empty' });
     user.avatarColor = avatarColor;
+  }
+  if (Object.prototype.hasOwnProperty.call(req.body || {}, 'avatarUrl')) {
+    user.avatarUrl = cleanAvatarUrl(req.body.avatarUrl);
   }
 
   save();

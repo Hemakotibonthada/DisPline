@@ -454,11 +454,13 @@ export function StoreProvider({ user, setUser, onLogout, children }) {
       /* ---- Profile / settings ---- */
       setBio: (bio) => commit((draft) => { draft.profile.bio = bio; }),
       setSetting: (key, value) => commit((draft) => { draft.settings[key] = value; }),
-      updateProfile: (name, avatarColor) => {
+      updateProfile: (name, avatarColor, avatarUrl) => {
+        const patch = { name, avatarColor };
+        if (avatarUrl !== undefined) patch.avatarUrl = avatarUrl;
         if (getToken() && !user.isGuest) {
-          api.updateProfile({ name, avatarColor }).then(() => setUser({ ...user, name, avatarColor })).catch(() => {});
+          api.updateProfile(patch).then((res) => setUser({ ...user, ...patch, ...(res?.user || {}) })).catch(() => setUser({ ...user, ...patch }));
         } else {
-          auth.updateAccount(user.id, { name, avatarColor });
+          auth.updateAccount(user.id, patch);
           setUser({ ...auth.getUserById(user.id) });
         }
       },
