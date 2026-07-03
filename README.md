@@ -3,8 +3,9 @@
 A dark, developer‑grade **personal execution OS** — part discipline dashboard, part
 habit engine, part wellness tracker, fully gamified. It merges the original
 "Rule of 2 / Don't Break the Chain" discipline app with the feature set of
-[MicroHabit](https://github.com/Hemakotibonthada/MicroHabit), delivered as a
-single **installable, offline‑first PWA** with **local multi‑user accounts**.
+[MicroHabit](https://github.com/Hemakotibonthada/MicroHabit). Runs as an
+**installable PWA** with a **Node/Express backend** for real accounts, cross‑device
+sync and friends — plus an offline **guest** mode.
 
 Three pillars: **Ruthless Focus** · **Unforgiving Consistency** · **Minimalist Metrics**.
 
@@ -12,11 +13,15 @@ Three pillars: **Ruthless Focus** · **Unforgiving Consistency** · **Minimalist
 
 ## Features
 
-### Accounts (works for everyone)
-- **Login / Sign‑up / Guest** — anyone can create their own account on their device.
-- Passwords are salted + hashed locally (self‑contained SHA‑256 that works even over
-  plain `http://` on a phone). Each user's data is namespaced separately in `localStorage`.
-- Session persists across refreshes; **Log out** returns to the auth screen.
+### Accounts, sync & friends
+- **Sign up / Log in** with name, unique **username** and email (JWT auth, bcrypt‑hashed
+  passwords). Log in by **email or username**.
+- **Cross‑device sync** — your full state syncs to the server, so you pick up where you
+  left off on any device.
+- **Invite people by email or username**, accept/decline invites, and build a friends list.
+- **Track friends' progress** — open any friend to see their live stats, **discipline &
+  actions trend charts**, and a **category‑mix donut**, plus a **friends leaderboard**.
+- **Guest mode** stays entirely on the device (no sync/friends) for a zero‑signup try.
 
 ### Today (the discipline dashboard)
 - **Daily Discipline Score** — animated 0–100% gauge from your two non‑negotiables.
@@ -71,54 +76,60 @@ Three pillars: **Ruthless Focus** · **Unforgiving Consistency** · **Minimalist
 
 ```bash
 npm install
-npm run dev            # local dev server (prints the URL)
-npm run dev -- --host  # also expose on your LAN to open it on your phone
+npm run dev            # runs the API server (:8787) AND the Vite client (:5173) together
 ```
 
-Open the **Network** URL printed by `--host` (e.g. `http://192.168.x.x:5173`) on a
-phone connected to the same Wi‑Fi, then use your browser's **"Add to Home Screen"** to
-install it as an app.
+Vite proxies `/api` to the backend, so just open the client URL. To open it on your
+**phone** (same Wi‑Fi), expose the client on your LAN and point the phone at the Network URL:
 
+```bash
+npm run dev:client -- --host   # in one terminal
+npm run dev:server             # in another
+```
+
+For a single‑process production run (the server serves the built client + API on one port):
+
+```bash
+npm run build && npm start     # http://localhost:8787
+```
+
+Config via env: `PORT` (default 8787) and `JWT_SECRET` (set a real secret in production).
 Other scripts: `npm run build` · `npm run preview` · `npm run lint`.
 
 ## Data & privacy
 
-Everything is stored **locally in the browser** — nothing is sent anywhere. This is a
-personal, offline‑first tracker. Keys:
-
-| Key | Contents |
-| --- | --- |
-| `des.accounts.v1` | accounts (name, email, salted password hash, avatar) |
-| `des.session.v1` | active session |
-| `des.u.<userId>.state.v1` | that user's full app state |
-| `des.focus.timer.v1` | the running focus timer |
-
-> Because auth is device‑local, accounts and data live on the device where they were
-> created (they don't sync across devices). Use **Export / Import** in Profile to move
-> data between browsers.
+- **Accounts** (name, username, email, bcrypt password hash), **synced state** and
+  **friend connections** live in the backend's JSON store at `server/data.json`
+  (git‑ignored). Only a summary of your progress is exposed to friends — your journal and
+  raw data stay private.
+- The JWT is kept in `localStorage` (`des.token.v1`); the app also caches your state
+  locally for instant loads. **Guest** sessions never touch the server.
+- Self‑hosted and dependency‑light — run it on your own machine or box; nothing goes to a
+  third party.
 
 ## Tech
 
-React 19 · Vite 8 · hand‑authored CSS design system (no UI framework) · no backend.
+React 19 · Vite 8 · Node/Express + JWT (jsonwebtoken) + bcryptjs, JSON‑file store ·
+hand‑authored CSS design system (no UI framework).
 
 ## Project structure
 
 ```
+server/                         # Node/Express backend (ESM)
+├─ index.js                     # app entry, CORS, serves built client + /api, health
+├─ routes.js                    # auth, state sync, users/search, invites, friends, progress, leaderboard
+├─ auth.js                      # JWT sign + auth middleware
+└─ db.js                        # tiny JSON-file database (server/data.json)
 src/
-├─ App.jsx                     # auth gate (AuthScreen vs StoreProvider + AppShell)
-├─ main.jsx                    # entry + service‑worker registration
-├─ index.css / app.css         # design system + shell/auth/view styles
-├─ store/
-│  ├─ StoreContext.jsx         # per‑user state, persistence, XP engine, all actions
-│  ├─ auth.js                  # local accounts, SHA‑256 hashing, sessions
-│  ├─ defaults.js              # categories, levels, achievements, challenges, content
-│  └─ selectors.js             # stats, heatmap, leaderboard
-├─ lib/                        # dateUtils, discipline math, format, useLocalStorage
+├─ App.jsx                      # auth gate + session restore (token / guest)
+├─ api/client.js                # fetch wrapper + all API methods (JWT)
+├─ store/                       # StoreContext (+ server sync), auth (guest), defaults, selectors
+├─ lib/                         # dateUtils, discipline math, format, sfx, useInstallPrompt
 └─ components/
-   ├─ auth/AuthScreen.jsx
-   ├─ shell/AppShell.jsx       # sidebar + topbar + bottom‑nav + toasts + notifications
-   ├─ common/Ring.jsx
+   ├─ auth/AuthScreen.jsx       # API-backed sign up / log in + guest
+   ├─ shell/AppShell.jsx        # sidebar + topbar + bottom-nav + toasts + command palette
+   ├─ common/                   # Ring, charts (Line/Bar/Donut), Trends, Confetti, CommandPalette
    ├─ Header / DisciplineGauge / FocusBoard / Pillar / MomentumTimer / HabitChain / MetricLogs
-   └─ views/                   # Today, Habits, Focus, Journal, Wellness, Progress, Profile
-public/                        # manifest.webmanifest, sw.js, icon.svg, favicon.svg
+   └─ views/                    # Today, Habits, Focus, Journal, Wellness, Progress, Social, Profile
+public/                         # manifest.webmanifest, sw.js, icon.svg, favicon.svg
 ```

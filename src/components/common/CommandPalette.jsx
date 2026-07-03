@@ -16,6 +16,7 @@ export default function CommandPalette({ open, onClose, onNavigate }) {
       nav('journal', '📝', 'Go to Journal'),
       nav('wellness', '🌿', 'Go to Wellness'),
       nav('progress', '📈', 'Go to Progress'),
+      nav('social', '🤝', 'Go to Friends'),
       nav('profile', '👤', 'Go to Profile'),
       { id: 'water', icon: '💧', label: 'Add a glass of water', hint: 'Action', run: () => actions.addWater(1) },
       { id: 'micro', icon: '⚡', label: 'Refresh micro-actions', hint: 'Action', run: () => { actions.refreshMicro(); onNavigate('today'); } },

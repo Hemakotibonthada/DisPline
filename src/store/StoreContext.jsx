@@ -10,7 +10,8 @@ import {
   randomMicroAction,
 } from './defaults.js';
 import * as auth from './auth.js';
-import { computeStats } from './selectors.js';
+import { categoryBreakdown, computeStats, dailyTrends } from './selectors.js';
+import { api, getToken } from '../api/client.js';
 
 const StoreContext = createContext(null);
 export const useStore = () => useContext(StoreContext);
@@ -229,6 +230,61 @@ export function StoreProvider({ user, setUser, onLogout, children }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.id]);
 
+  // ---- Server sync (online accounts only) ----
+  const hydratedRef = useRef(false);
+
+  const pushState = useCallback(
+    (snap) => {
+      if (!getToken() || user.isGuest) return;
+      try {
+        const stats = computeStats(snap);
+        const lvl = levelFromXp(stats.xp);
+        const summary = {
+          level: lvl.level,
+          xp: stats.xp,
+          coins: stats.coins,
+          currentStreak: stats.currentStreak,
+          longestStreak: stats.longestStreak,
+          totalActions: stats.totalActions,
+          achievementsCount: Object.keys(snap.gamification?.achievements || {}).length,
+          focusMinutes: stats.focusMinutes,
+        };
+        api.putState({ state: snap, summary, trends: dailyTrends(snap, 30), categories: categoryBreakdown(snap) }).catch(() => {});
+      } catch { /* ignore */ }
+    },
+    [user.isGuest],
+  );
+
+  // Pull server state on login; seed the server if it has none.
+  useEffect(() => {
+    hydratedRef.current = false;
+    if (!getToken() || user.isGuest) { hydratedRef.current = true; return undefined; }
+    let cancelled = false;
+    api
+      .getState()
+      .then((res) => {
+        if (cancelled) return;
+        if (res && res.state && typeof res.state === 'object') {
+          const merged = loadStateFromObject(res.state);
+          ensureDailyMicro(merged);
+          stateRef.current = merged;
+          setState(merged);
+        } else {
+          pushState(stateRef.current);
+        }
+        hydratedRef.current = true;
+      })
+      .catch(() => { hydratedRef.current = true; });
+    return () => { cancelled = true; };
+  }, [user.id, user.isGuest, pushState]);
+
+  // Debounced push on any change.
+  useEffect(() => {
+    if (!getToken() || user.isGuest || !hydratedRef.current) return undefined;
+    const id = setTimeout(() => pushState(state), 1500);
+    return () => clearTimeout(id);
+  }, [state, user.id, user.isGuest, pushState]);
+
   const actions = useMemo(() => {
     const T = () => todayKey();
     const patchToday = (fn) =>
@@ -399,8 +455,12 @@ export function StoreProvider({ user, setUser, onLogout, children }) {
       setBio: (bio) => commit((draft) => { draft.profile.bio = bio; }),
       setSetting: (key, value) => commit((draft) => { draft.settings[key] = value; }),
       updateProfile: (name, avatarColor) => {
-        auth.updateAccount(user.id, { name, avatarColor });
-        setUser({ ...auth.getUserById(user.id) });
+        if (getToken() && !user.isGuest) {
+          api.updateProfile({ name, avatarColor }).then(() => setUser({ ...user, name, avatarColor })).catch(() => {});
+        } else {
+          auth.updateAccount(user.id, { name, avatarColor });
+          setUser({ ...auth.getUserById(user.id) });
+        }
       },
 
       /* ---- Notifications ---- */
@@ -425,7 +485,7 @@ export function StoreProvider({ user, setUser, onLogout, children }) {
       dismissToast,
       logout: onLogout,
     };
-  }, [commit, dismissToast, onLogout, pushToasts, setUser, user.id, user.name, user.avatarColor]);
+  }, [commit, dismissToast, onLogout, pushToasts, setUser, user]);
 
   const derived = useMemo(() => {
     const stats = computeStats(state);

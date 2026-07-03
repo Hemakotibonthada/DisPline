@@ -11,6 +11,7 @@ import JournalView from '../views/JournalView.jsx';
 import WellnessView from '../views/WellnessView.jsx';
 import ProgressView from '../views/ProgressView.jsx';
 import ProfileView from '../views/ProfileView.jsx';
+import SocialView from '../views/SocialView.jsx';
 
 const NAV = [
   { id: 'today', label: 'Today', icon: '◎' },
@@ -19,6 +20,7 @@ const NAV = [
   { id: 'journal', label: 'Journal', icon: '📝' },
   { id: 'wellness', label: 'Wellness', icon: '🌿' },
   { id: 'progress', label: 'Progress', icon: '📈' },
+  { id: 'social', label: 'Friends', icon: '🤝' },
   { id: 'profile', label: 'Profile', icon: '👤' },
 ];
 const BOTTOM = NAV.filter((n) => n.id !== 'profile');
@@ -30,6 +32,7 @@ const VIEWS = {
   journal: JournalView,
   wellness: WellnessView,
   progress: ProgressView,
+  social: SocialView,
   profile: ProfileView,
 };
 
@@ -55,6 +58,9 @@ export default function AppShell() {
 
   const level = derived.level;
   const unread = state.notifications.filter((n) => !n.read).length;
+  const navItems = user.isGuest ? NAV.filter((n) => n.id !== 'social') : NAV;
+  const bottomItems = user.isGuest ? BOTTOM.filter((n) => n.id !== 'social') : BOTTOM;
+  const showGuestSocial = view === 'social' && user.isGuest;
   const ActiveView = VIEWS[view] || TodayView;
 
   useEffect(() => { setNotifOpen(false); }, [view]);
@@ -112,7 +118,7 @@ export default function AppShell() {
           </div>
         </div>
         <nav className="stack" style={{ gap: 4 }}>
-          {NAV.map((n) => (
+          {navItems.map((n) => (
             <button key={n.id} className={`nav-item${view === n.id ? ' active' : ''}`} onClick={() => go(n.id)}>
               <span className="ic">{n.icon}</span>
               {n.label}
@@ -188,11 +194,23 @@ export default function AppShell() {
           )}
         </header>
 
-        <ActiveView />
+        {showGuestSocial ? (
+          <div className="view">
+            <div className="vtitle"><h2>Friends</h2></div>
+            <p className="view-sub">Invite people and track their progress across devices.</p>
+            <div className="panel panel-p social-empty">
+              <div className="big">🤝</div>
+              <div style={{ marginBottom: 14 }}>Friends &amp; invites need a real account. Guest data stays on this device only.</div>
+              <button className="btn solid" onClick={actions.logout}>Create an account</button>
+            </div>
+          </div>
+        ) : (
+          <ActiveView />
+        )}
       </div>
 
       <nav className="bottom-nav">
-        {BOTTOM.map((n) => (
+        {bottomItems.map((n) => (
           <button key={n.id} className={`bn-item${view === n.id ? ' active' : ''}`} onClick={() => go(n.id)}>
             <span className="ic">{n.icon}</span>
             {n.label}

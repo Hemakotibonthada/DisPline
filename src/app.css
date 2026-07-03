@@ -433,3 +433,48 @@ textarea.input { resize: vertical; min-height: 84px; line-height: 1.5; }
 .shield-banner .sb-d { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
 .shield-banner .sb-btn { margin-left: auto; flex: none; }
 @media (max-width: 560px) { .shield-banner { flex-wrap: wrap; } .shield-banner .sb-btn { margin-left: 0; width: 100%; } }
+
+/* =====================================================================
+   CHARTS
+   ===================================================================== */
+.chart { position: relative; }
+.chart-svg { width: 100%; display: block; }
+.chart-ymax { position: absolute; top: 2px; left: 4px; font-size: 10px; color: var(--text-ghost); }
+.chart-xaxis { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-ghost); font-family: var(--font-mono); margin-top: 6px; }
+.chart-legend { display: flex; gap: 14px; margin-top: 10px; flex-wrap: wrap; }
+.chart-legend span { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); font-weight: 600; }
+.chart-legend i { width: 11px; height: 3px; border-radius: 2px; display: inline-block; }
+.donut { position: relative; display: grid; place-items: center; }
+.donut svg { transform: rotate(0deg); }
+.donut-center { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }
+
+/* =====================================================================
+   SOCIAL / FRIENDS
+   ===================================================================== */
+.social-tabs { display: flex; gap: 6px; padding: 5px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.social-tab { flex: 1; min-width: 90px; height: 38px; border-radius: 9px; border: none; background: transparent; color: var(--text-muted); font-weight: 700; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 7px; transition: all 0.15s ease; }
+.social-tab.active { background: var(--surface-3); color: var(--text); }
+.social-tab .tab-badge { font-family: var(--font-mono); font-size: 10px; font-weight: 800; background: var(--red); color: #fff; padding: 1px 6px; border-radius: 999px; }
+
+.invite-form { display: flex; gap: 8px; }
+@media (max-width: 520px) { .invite-form { flex-direction: column; } }
+
+.person-card { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface-2); }
+.person-card .pc-body { flex: 1; min-width: 0; }
+.person-card .pc-name { font-size: 13.5px; font-weight: 700; }
+.person-card .pc-sub { font-size: 11.5px; color: var(--text-faint); }
+.person-card .pc-actions { display: flex; gap: 6px; flex: none; }
+.person-card.clickable { cursor: pointer; transition: border-color 0.15s ease, transform 0.1s ease; }
+.person-card.clickable:hover { border-color: color-mix(in srgb, var(--brand) 40%, transparent); transform: translateY(-1px); }
+
+.search-results { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+
+.friend-progress { display: flex; flex-direction: column; gap: 16px; }
+.fp-hero { display: flex; align-items: center; gap: 14px; }
+.fp-hero .avatar { flex: none; }
+.fp-stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+@media (max-width: 620px) { .fp-stat-grid { grid-template-columns: repeat(2, 1fr); } }
+.fp-updated { font-size: 11px; color: var(--text-ghost); }
+
+.social-empty { text-align: center; padding: 30px 16px; color: var(--text-faint); }
+.social-empty .big { font-size: 34px; margin-bottom: 8px; opacity: 0.7; }

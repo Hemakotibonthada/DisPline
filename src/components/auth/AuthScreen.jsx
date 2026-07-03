@@ -1,38 +1,40 @@
 import { useState } from 'react';
 import { AVATAR_COLORS } from '../../store/defaults.js';
-import { accountCount, login, loginAsGuest, register } from '../../store/auth.js';
+import { api, setToken } from '../../api/client.js';
+import { loginAsGuest } from '../../store/auth.js';
 
 export default function AuthScreen({ onAuthed }) {
-  const [mode, setMode] = useState(accountCount() > 0 ? 'login' : 'register');
+  const [mode, setMode] = useState('login');
   const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [avatarColor, setAvatarColor] = useState(AVATAR_COLORS[0]);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
     setError('');
     setBusy(true);
-    // Hashing is synchronous but can take a beat on mobile — yield a frame first.
-    setTimeout(() => {
+    try {
       const res =
         mode === 'register'
-          ? register({ name, email, password, avatarColor })
-          : login({ email, password });
+          ? await api.register({ name, username, email, password, avatarColor })
+          : await api.login({ identifier, password });
+      setToken(res.token);
+      onAuthed({ ...res.user, online: true });
+    } catch (err) {
+      setError(err.message || 'Something went wrong.');
+    } finally {
       setBusy(false);
-      if (!res.ok) {
-        setError(res.error);
-        return;
-      }
-      onAuthed(res.user);
-    }, 10);
+    }
   };
 
   const guest = () => {
     const res = loginAsGuest();
-    if (res.ok) onAuthed(res.user);
+    if (res.ok) onAuthed({ ...res.user, online: false });
   };
 
   return (
@@ -46,27 +48,36 @@ export default function AuthScreen({ onAuthed }) {
         </div>
 
         <div className="auth-tabs" role="tablist">
-          <button className={`auth-tab${mode === 'login' ? ' active' : ''}`} onClick={() => { setMode('login'); setError(''); }}>
-            Log in
-          </button>
-          <button className={`auth-tab${mode === 'register' ? ' active' : ''}`} onClick={() => { setMode('register'); setError(''); }}>
-            Sign up
-          </button>
+          <button className={`auth-tab${mode === 'login' ? ' active' : ''}`} onClick={() => { setMode('login'); setError(''); }}>Log in</button>
+          <button className={`auth-tab${mode === 'register' ? ' active' : ''}`} onClick={() => { setMode('register'); setError(''); }}>Sign up</button>
         </div>
 
         {error ? <div className="auth-error">⚠ {error}</div> : null}
 
         <form onSubmit={submit}>
-          {mode === 'register' && (
+          {mode === 'register' ? (
+            <>
+              <div className="field">
+                <label>Name</label>
+                <input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" maxLength={40} autoComplete="name" />
+              </div>
+              <div className="field">
+                <label>Username</label>
+                <input className="input" value={username} onChange={(e) => setUsername(e.target.value.replace(/[^a-zA-Z0-9_]/g, ''))} placeholder="e.g. hema_k" maxLength={20} autoComplete="username" />
+                <div className="hintline">3–20 letters, numbers or underscores. Friends can invite you by this.</div>
+              </div>
+              <div className="field">
+                <label>Email</label>
+                <input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email" />
+              </div>
+            </>
+          ) : (
             <div className="field">
-              <label>Name</label>
-              <input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" maxLength={40} autoComplete="name" />
+              <label>Email or username</label>
+              <input className="input" value={identifier} onChange={(e) => setIdentifier(e.target.value)} placeholder="you@example.com or @username" autoComplete="username" />
             </div>
           )}
-          <div className="field">
-            <label>Email</label>
-            <input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email" />
-          </div>
+
           <div className="field">
             <label>Password</label>
             <input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={mode === 'register' ? 'At least 6 characters' : 'Your password'} autoComplete={mode === 'register' ? 'new-password' : 'current-password'} />
@@ -77,21 +88,14 @@ export default function AuthScreen({ onAuthed }) {
               <label>Avatar color</label>
               <div className="avatar-picker">
                 {AVATAR_COLORS.map((c) => (
-                  <button
-                    type="button"
-                    key={c}
-                    className={`avatar-dot${avatarColor === c ? ' sel' : ''}`}
-                    style={{ background: c }}
-                    onClick={() => setAvatarColor(c)}
-                    aria-label={`Pick color ${c}`}
-                  />
+                  <button type="button" key={c} className={`avatar-dot${avatarColor === c ? ' sel' : ''}`} style={{ background: c }} onClick={() => setAvatarColor(c)} aria-label={`Pick color ${c}`} />
                 ))}
               </div>
             </div>
           )}
 
           <button className="btn solid block" type="submit" disabled={busy} style={{ marginTop: 6 }}>
-            {busy ? 'Securing…' : mode === 'register' ? 'Create account' : 'Log in'}
+            {busy ? 'Please wait…' : mode === 'register' ? 'Create account' : 'Log in'}
           </button>
         </form>
 
@@ -105,8 +109,8 @@ export default function AuthScreen({ onAuthed }) {
         </div>
 
         <div className="auth-note">
-          🔒 Accounts are stored locally on this device. This is a personal, offline-first tracker —
-          no data leaves your browser.
+          🔒 Real accounts sync across devices and let you invite friends. Guest mode stays
+          on this device only.
         </div>
       </div>
     </div>
