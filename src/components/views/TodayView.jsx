@@ -3,6 +3,7 @@ import Header from '../Header.jsx';
 import FocusBoard from '../FocusBoard.jsx';
 import HabitChain from '../HabitChain.jsx';
 import MetricLogs from '../MetricLogs.jsx';
+import DailyActivity from '../common/DailyActivity.jsx';
 import { useStore } from '../../store/StoreContext.jsx';
 import {
   currentStreak,
@@ -70,11 +71,6 @@ export default function TodayView() {
   const affirmation = pickDaily(AFFIRMATIONS, today);
   const shields = state.gamification.streakShields || 0;
   const showShield = nmt.missedYesterday && shields > 0;
-
-  const waterToday = state.water[today] || 0;
-  const focusMinToday = state.focusSessions
-    .filter((f) => (f.at || '').slice(0, 10) === today)
-    .reduce((s, f) => s + (f.minutes || 0), 0);
 
   const addCustom = () => {
     if (!custom.trim()) return;
@@ -158,28 +154,7 @@ export default function TodayView() {
           </div>
         </section>
 
-        <section className="panel" style={{ padding: 20 }}>
-          <div className="section-h"><h3>📊 Today at a Glance</h3></div>
-          <div className="quickwell">
-            <div className="qw">
-              <div className="qwv num">{score}<span style={{ fontSize: 13, color: 'var(--text-faint)' }}>%</span></div>
-              <div className="qwl">Discipline</div>
-            </div>
-            <div className="qw">
-              <div className="qwv num">{cs}</div>
-              <div className="qwl">Day Streak</div>
-            </div>
-            <div className="qw">
-              <div className="qwv num">{waterToday}<span style={{ fontSize: 13, color: 'var(--text-faint)' }}>/{state.waterGoal}</span></div>
-              <div className="qwl">💧 Water</div>
-            </div>
-            <div className="qw">
-              <div className="qwv num">{focusMinToday}<span style={{ fontSize: 13, color: 'var(--text-faint)' }}>m</span></div>
-              <div className="qwl">🎯 Focus</div>
-            </div>
-          </div>
-          <button className="btn block ghost" style={{ marginTop: 12 }} onClick={() => actions.addWater(1)}>💧 +1 Glass of Water</button>
-        </section>
+        <DailyActivity />
       </div>
 
       <div className="lower">

@@ -613,7 +613,7 @@ function ProgressModal({ friend, progress, loading, error, busy, onClose, onUnfr
                     <span className="hint">0–100%</span>
                   </div>
                   <LineChart
-                    series={[{ name: 'Discipline %', color: '#34d399', values: trends.map((trend) => trend.discipline || 0), area: true }]}
+                    series={[{ name: 'Discipline %', color: '#4285f4', values: trends.map((trend) => trend.discipline || 0), area: true }]}
                     max={100}
                     height={180}
                     labels={labels}
@@ -626,7 +626,7 @@ function ProgressModal({ friend, progress, loading, error, busy, onClose, onUnfr
                     <span className="hint">max {actionMax}</span>
                   </div>
                   <LineChart
-                    series={[{ name: 'Actions', color: '#60a5fa', values: trends.map((trend) => trend.actions || 0), area: true }]}
+                    series={[{ name: 'Actions', color: '#34a853', values: trends.map((trend) => trend.actions || 0), area: true }]}
                     max={actionMax}
                     height={145}
                     labels={labels}

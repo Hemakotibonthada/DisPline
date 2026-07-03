@@ -44,9 +44,21 @@
   --brand: #34d399;
   --brand-2: #10b981;
 
-  /* ---- type ---- */
-  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', 'SFMono-Regular', 'Consolas', ui-monospace, monospace;
+  /* ---- type (Google Health stack) ---- */
+  --font-sans: 'Google Sans', 'Google Sans Text', Roboto, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Google Sans', Roboto, system-ui, sans-serif;
+  --font-mono: 'Roboto Mono', 'SFMono-Regular', 'Consolas', ui-monospace, monospace;
+
+  /* ---- Google Fit / Material data-viz palette ---- */
+  --g-blue: #4285f4;
+  --g-green: #34a853;
+  --g-yellow: #fbbc04;
+  --g-red: #ea4335;
+  --g-teal: #12b5cb;
+  --g-purple: #a142f4;
+  --g-orange: #fa7b17;
+  --g-cyan: #24c1e0;
+  --g-pink: #ff5c8d;
 
   /* ---- geometry ---- */
   --r-sm: 8px;
@@ -93,6 +105,8 @@ input { font-family: inherit; }
 *::-webkit-scrollbar-thumb { background: var(--surface-4); border-radius: 20px; border: 2px solid transparent; background-clip: padding-box; }
 
 .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.2px; }
 
 /* =====================================================================
    APP SHELL

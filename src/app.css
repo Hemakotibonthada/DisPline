@@ -448,6 +448,33 @@ textarea.input { resize: vertical; min-height: 84px; line-height: 1.5; }
 .donut svg { transform: rotate(0deg); }
 .donut-center { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }
 
+/* Google Fit activity rings */
+.rings { position: relative; display: grid; place-items: center; }
+.rings svg { display: block; }
+.ring-arc { transition: stroke-dashoffset 1.1s cubic-bezier(0.16, 1, 0.3, 1); }
+.rings-center { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; font-family: var(--font-display); }
+.rings-center .rc-big { font-size: 30px; font-weight: 700; line-height: 1; }
+.rings-center .rc-sub { font-size: 10px; color: var(--text-faint); text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; }
+
+/* Google-style rounded bar chart */
+.gbars { display: flex; align-items: flex-end; gap: 8px; height: 150px; }
+.gbar-col { flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; justify-content: flex-end; }
+.gbar-val { font-family: var(--font-mono); font-size: 10px; color: var(--text-faint); }
+.gbar-track { width: 100%; max-width: 30px; flex: 1; display: flex; align-items: flex-end; background: var(--surface-3); border-radius: 999px; overflow: hidden; min-height: 44px; }
+.gbar-fill { width: 100%; border-radius: 999px; min-height: 6px; transition: height 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+.gbar-lbl { font-size: 15px; }
+
+/* Daily activity (Google Fit) panel */
+.gfit { display: grid; grid-template-columns: auto 1fr; gap: 22px; align-items: center; }
+@media (max-width: 480px) { .gfit { grid-template-columns: 1fr; justify-items: center; } }
+.gfit-legend { display: flex; flex-direction: column; gap: 14px; width: 100%; }
+.gfit-metric { display: flex; align-items: center; gap: 12px; }
+.gfit-dot { width: 12px; height: 12px; border-radius: 50%; flex: none; box-shadow: 0 0 8px currentColor; }
+.gfit-metric .gm-body { flex: 1; min-width: 0; }
+.gfit-metric .gm-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+.gfit-metric .gm-value { font-family: var(--font-display); font-size: 21px; font-weight: 700; line-height: 1.1; }
+.gfit-metric .gm-value small { font-size: 12px; color: var(--text-faint); font-weight: 500; }
+
 /* =====================================================================
    SOCIAL / FRIENDS
    ===================================================================== */

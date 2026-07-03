@@ -34,11 +34,11 @@ export default function Trends() {
       <div className="grid g2">
         <div className="trend-card">
           <div className="trend-lbl">Discipline %</div>
-          <LineChart series={[{ name: 'Discipline', color: '#34d399', values: disc, area: true }]} max={100} height={150} labels={labels} unit="%" />
+          <LineChart series={[{ name: 'Discipline', color: '#4285f4', values: disc, area: true }]} max={100} height={150} labels={labels} unit="%" />
         </div>
         <div className="trend-card">
           <div className="trend-lbl">Actions / day</div>
-          <LineChart series={[{ name: 'Actions', color: '#60a5fa', values: acts, area: true }]} height={150} labels={labels} />
+          <LineChart series={[{ name: 'Actions', color: '#34a853', values: acts, area: true }]} height={150} labels={labels} />
         </div>
       </div>
 
