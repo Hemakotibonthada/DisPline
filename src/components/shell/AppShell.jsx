@@ -1,5 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useStore } from '../../store/StoreContext.jsx';
+import CommandPalette from '../common/CommandPalette.jsx';
+import Confetti from '../common/Confetti.jsx';
+import { useInstallPrompt } from '../../lib/useInstallPrompt.js';
+import { playLevelUp, playPop } from '../../lib/sfx.js';
 import TodayView from '../views/TodayView.jsx';
 import HabitsView from '../views/HabitsView.jsx';
 import FocusView from '../views/FocusView.jsx';
@@ -44,12 +48,49 @@ export default function AppShell() {
   const { state, actions, derived, toasts, user } = useStore();
   const [view, setView] = useState('today');
   const [notifOpen, setNotifOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [confettiN, setConfettiN] = useState(0);
+  const seenToasts = useRef(new Set());
+  const { canInstall, promptInstall } = useInstallPrompt();
 
   const level = derived.level;
   const unread = state.notifications.filter((n) => !n.read).length;
   const ActiveView = VIEWS[view] || TodayView;
 
   useEffect(() => { setNotifOpen(false); }, [view]);
+
+  // Global keyboard: Cmd/Ctrl+K toggles the command palette; 1–7 switch views.
+  useEffect(() => {
+    const onKey = (e) => {
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        setPaletteOpen((o) => !o);
+        return;
+      }
+      const tag = (e.target.tagName || '').toLowerCase();
+      const typing = tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable;
+      if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
+      const idx = parseInt(e.key, 10);
+      if (idx >= 1 && idx <= NAV.length) {
+        setView(NAV[idx - 1].id);
+        window.scrollTo({ top: 0 });
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  // Celebrate level-ups / achievements with confetti + optional sound.
+  useEffect(() => {
+    let celebrate = false;
+    for (const t of toasts) {
+      if (seenToasts.current.has(t.id)) continue;
+      seenToasts.current.add(t.id);
+      if (t.type === 'level' || t.type === 'achievement') { celebrate = true; playLevelUp(state.settings.sound); }
+      else if (t.type === 'reward') playPop(state.settings.sound);
+    }
+    if (celebrate) setConfettiN((n) => n + 1);
+  }, [toasts, state.settings.sound]);
 
   const openNotifs = () => {
     setNotifOpen((o) => !o);
@@ -115,6 +156,12 @@ export default function AppShell() {
               <span className="v num">{derived.stats.currentStreak}</span>
             </div>
           </div>
+          {canInstall && (
+            <button className="install-btn" onClick={promptInstall} title="Install app">⤓ <span className="lbl">Install</span></button>
+          )}
+          <button className="cmdk-btn" onClick={() => setPaletteOpen(true)} title="Command palette (Ctrl/Cmd+K)">
+            <span>🔍</span><span className="lbl kbd">⌘K</span>
+          </button>
           <button className="notif-btn" onClick={openNotifs} aria-label="Notifications">
             🔔
             {unread ? <span className="notif-badge num">{unread}</span> : null}
@@ -166,6 +213,9 @@ export default function AppShell() {
           ))}
         </div>
       )}
+
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} onNavigate={(id) => go(id)} />
+      <Confetti trigger={confettiN} reduced={state.settings.reduceMotion} />
     </div>
   );
 }

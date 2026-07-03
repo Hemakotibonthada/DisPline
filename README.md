@@ -52,6 +52,17 @@ Three pillars: **Ruthless Focus** · **Unforgiving Consistency** · **Minimalist
 - Earn XP + coins for every completed action; automatic **level‑ups**, **achievement
   unlocks** and **toasts**; a notification center in the top bar.
 
+### Power‑ups
+- **Command palette** (`Ctrl`/`⌘` + `K`) — searchable navigation + quick actions
+  (add water, refresh micro‑actions, start focus, new journal/habit, log out).
+- **Keyboard shortcuts** — press `1`–`7` to jump between views.
+- **Celebrations** — confetti burst + optional chime on level‑ups and achievements
+  (both respect the reduce‑motion and sound settings).
+- **14‑day trends** — discipline %, actions/day and mood sparklines in Progress.
+- **Streak Shield** — buy shields in the shop and spend one to restore a missed day
+  and keep your chain alive.
+- **Install prompt** — an in‑app "Install" button appears when the browser offers it.
+
 ### PWA / Mobile
 - Installable (manifest + service worker), offline‑capable, responsive from 360px up
   with a mobile **bottom tab bar** and desktop **sidebar**.

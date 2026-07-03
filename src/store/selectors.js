@@ -1,5 +1,5 @@
 import { currentStreak, disciplineScore, longestStreak, normalizeDay, statusOf } from '../lib/discipline.js';
-import { addDays, todayKey } from '../lib/dateUtils.js';
+import { addDays, lastNDays, todayKey } from '../lib/dateUtils.js';
 import { levelFromXp } from './defaults.js';
 
 /** One rolled-up stats object used by achievements, milestones and the Progress view. */
@@ -128,4 +128,25 @@ export function localLeaderboard() {
   } catch {
     return [];
   }
+}
+
+/** Per-day series for the last `n` days: discipline %, actions completed, avg mood. */
+export function dailyTrends(state, n = 14) {
+  const days = state.days || {};
+  const micro = state.microActions || {};
+  const habits = state.habits || [];
+  const moodByDate = {};
+  for (const m of state.mood || []) {
+    (moodByDate[m.date] ||= []).push(m.mood);
+  }
+  return lastNDays(n).map((date) => {
+    const d = normalizeDay(days[date]);
+    let actions = (micro[date] || []).filter((a) => a.done).length;
+    if (d.technical.goal && d.technical.goalDone) actions += 1;
+    if (d.physical.goal && d.physical.goalDone) actions += 1;
+    for (const h of habits) if (h.logs && h.logs[date]) actions += 1;
+    const moods = moodByDate[date] || [];
+    const mood = moods.length ? moods.reduce((s, x) => s + x, 0) / moods.length : null;
+    return { date, discipline: disciplineScore(d), actions, mood };
+  });
 }

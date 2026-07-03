@@ -394,3 +394,42 @@ textarea.input { resize: vertical; min-height: 84px; line-height: 1.5; }
   .g2, .g3, .g4 { grid-template-columns: 1fr; }
   .g4.keep2, .g3.keep2, .quickwell { grid-template-columns: 1fr 1fr; }
 }
+
+/* =====================================================================
+   ENHANCEMENTS — command palette, confetti, trends, install, shield
+   ===================================================================== */
+.confetti-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 200; }
+
+.cmdk { width: 100%; max-width: 540px; padding: 0; overflow: hidden; animation: fadeUp 0.22s cubic-bezier(0.16,1,0.3,1); }
+.cmdk-input { width: 100%; border: none; background: transparent; color: var(--text); font-size: 15px; padding: 18px 20px; outline: none; border-bottom: 1px solid var(--line); font-family: inherit; }
+.cmdk-input::placeholder { color: var(--text-ghost); font-size: 13px; }
+.cmdk-list { max-height: 52vh; overflow: auto; padding: 8px; }
+.cmdk-item { width: 100%; display: flex; align-items: center; gap: 12px; padding: 11px 12px; border: none; background: transparent; color: var(--text-muted); border-radius: 10px; cursor: pointer; text-align: left; font-size: 13.5px; }
+.cmdk-item.sel { background: color-mix(in srgb, var(--brand) 14%, transparent); color: var(--text); }
+.cmdk-ic { width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center; background: var(--surface-3); font-size: 14px; flex: none; }
+.cmdk-item.sel .cmdk-ic { background: color-mix(in srgb, var(--brand) 24%, transparent); }
+.cmdk-label { flex: 1; font-weight: 600; }
+.cmdk-hint { font-size: 10px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; color: var(--text-ghost); }
+
+.kbd { font-family: var(--font-mono); font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px; border: 1px solid var(--line-strong); background: var(--surface-3); color: var(--text-muted); }
+.cmdk-btn { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 12px; border-radius: 9px; border: 1px solid var(--line); background: var(--surface-2); color: var(--text-muted); font-size: 12px; font-weight: 600; cursor: pointer; }
+.cmdk-btn:hover { color: var(--text); background: var(--surface-3); }
+@media (max-width: 720px) { .cmdk-btn .lbl { display: none; } }
+
+.install-btn { display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 13px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--brand) 45%, transparent); background: color-mix(in srgb, var(--brand) 14%, transparent); color: var(--brand); font-weight: 700; font-size: 12.5px; cursor: pointer; }
+.install-btn:hover { filter: brightness(1.15); }
+
+.trend-card { background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.trend-lbl { font-size: 10.5px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-faint); margin-bottom: 8px; }
+.trend-svg { width: 100%; height: 64px; display: block; }
+.trend-bars { display: flex; align-items: flex-end; gap: 3px; height: 64px; }
+.tb-col { flex: 1; height: 100%; display: flex; align-items: flex-end; }
+.tb { width: 100%; border-radius: 3px 3px 0 0; background: linear-gradient(180deg, var(--brand), var(--brand-2)); min-height: 2px; }
+.trend-axis { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-ghost); font-family: var(--font-mono); margin-top: 8px; }
+
+.shield-banner { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: var(--r-lg); border: 1px solid rgba(56,189,248,0.4); background: linear-gradient(120deg, rgba(56,189,248,0.14), var(--surface-1)); }
+.shield-banner .sb-ic { font-size: 26px; flex: none; }
+.shield-banner .sb-t { font-size: 13.5px; font-weight: 800; }
+.shield-banner .sb-d { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+.shield-banner .sb-btn { margin-left: auto; flex: none; }
+@media (max-width: 560px) { .shield-banner { flex-wrap: wrap; } .shield-banner .sb-btn { margin-left: 0; width: 100%; } }

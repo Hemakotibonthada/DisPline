@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useStore } from '../../store/StoreContext.jsx';
 import { ACHIEVEMENTS, CHALLENGES, CATEGORIES, MILESTONES } from '../../store/defaults.js';
 import { activityHeatmap, categoryBreakdown, localLeaderboard } from '../../store/selectors.js';
+import Trends from '../common/Trends.jsx';
 
 const heatClass = (count) => {
   if (count >= 4) return 'h4';
@@ -80,6 +81,8 @@ export default function ProgressView() {
             <div className="sc-sub">All completed actions</div>
           </div>
         </section>
+
+        <Trends />
 
         <section className="grid g2">
           <div className="panel panel-p">

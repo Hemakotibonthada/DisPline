@@ -264,6 +264,22 @@ export function StoreProvider({ user, setUser, onLogout, children }) {
           draft.days[dateKey] = cur;
         }),
 
+      useStreakShield: (dateKey) =>
+        commit((draft, ctx) => {
+          if ((draft.gamification.streakShields || 0) <= 0) {
+            ctx.toast({ type: 'error', title: 'No streak shields', msg: 'Buy one in the rewards shop', icon: '🛡️' });
+            return;
+          }
+          const cur = normalizeDay(draft.days[dateKey]);
+          if (cur.status === 'win') return;
+          cur.status = 'win';
+          cur.shielded = true;
+          draft.days[dateKey] = cur;
+          draft.gamification.streakShields -= 1;
+          ctx.toast({ type: 'reward', title: 'Streak protected 🛡️', msg: 'Shield used to restore the day', icon: '🛡️' });
+          ctx.notif('streak', 'Used a Streak Shield to keep your chain alive');
+        }),
+
       setTimer: (pillar, next) =>
         commit((draft, ctx) => {
           const prev = draft.timers[pillar] || freshTimer();

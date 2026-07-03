@@ -14,6 +14,7 @@ import {
 } from '../../lib/discipline.js';
 import {
   buildChainWindow,
+  addDays,
   formatLongDate,
   formatShortDate,
   lastNDays,
@@ -67,6 +68,8 @@ export default function TodayView() {
   const micro = (state.microActions[today] || []).filter((a) => !a.skipped);
   const microDone = micro.filter((a) => a.done).length;
   const affirmation = pickDaily(AFFIRMATIONS, today);
+  const shields = state.gamification.streakShields || 0;
+  const showShield = nmt.missedYesterday && shields > 0;
 
   const waterToday = state.water[today] || 0;
   const focusMinToday = state.focusSessions
@@ -89,6 +92,17 @@ export default function TodayView() {
         currentStreak={cs}
         longestStreak={ls}
       />
+
+      {showShield && (
+        <div className="shield-banner">
+          <span className="sb-ic">🛡️</span>
+          <div>
+            <div className="sb-t">Your streak is at risk</div>
+            <div className="sb-d">Yesterday was a miss. Spend a Streak Shield ({shields} left) to restore it and keep your chain alive.</div>
+          </div>
+          <button className="btn solid sb-btn" onClick={() => actions.useStreakShield(addDays(today, -1))}>Use Shield 🛡️</button>
+        </div>
+      )}
 
       <div className="affirm panel">
         <div className="ic">✦</div>
