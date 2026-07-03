@@ -5,7 +5,11 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const dataPath = path.join(__dirname, 'data.json');
+// Persist to DATA_DIR when provided (e.g. a mounted disk on a cloud host),
+// otherwise alongside the server. This keeps accounts/friends across restarts.
+const dataDir = process.env.DATA_DIR || __dirname;
+try { fs.mkdirSync(dataDir, { recursive: true }); } catch { /* ignore */ }
+const dataPath = path.join(dataDir, 'data.json');
 
 const emptyDb = () => ({ users: [], invites: [], states: {} });
 

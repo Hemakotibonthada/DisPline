@@ -1,0 +1,15 @@
+{
+  "name": "The Daily Execution System",
+  "description": "Dark, gamified discipline + habit PWA with real accounts, friends and progress graphs.",
+  "repository": "https://github.com/Hemakotibonthada/DisPline",
+  "keywords": ["node", "express", "react", "vite", "pwa", "habits", "productivity"],
+  "env": {
+    "JWT_SECRET": {
+      "description": "Secret used to sign auth tokens. Keep this private.",
+      "generator": "secret"
+    }
+  },
+  "buildpacks": [
+    { "url": "heroku/nodejs" }
+  ]
+}

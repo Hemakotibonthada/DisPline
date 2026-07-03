@@ -96,6 +96,35 @@ npm run build && npm start     # http://localhost:8787
 Config via env: `PORT` (default 8787) and `JWT_SECRET` (set a real secret in production).
 Other scripts: `npm run build` · `npm run preview` · `npm run lint`.
 
+## Deploy (free)
+
+The whole thing is one Node process that serves the built client **and** the API, so any
+free Node host works. Set `JWT_SECRET` to a long random string in production.
+
+**Render (free, connect the repo):**
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Hemakotibonthada/DisPline)
+
+The included `render.yaml` sets build `npm install && npm run build`, start `npm start`,
+health check `/api/health`, and generates a `JWT_SECRET`. Render's free plan sleeps on
+idle and has an **ephemeral disk**, so `server/data.json` resets on redeploy — fine for a
+demo. For durable data, mount a disk at `/data` and set `DATA_DIR=/data`.
+
+**Docker (any host / your own box):**
+
+```bash
+docker build -t des .
+docker run -p 8787:8787 -e JWT_SECRET=change-me -v des_data:/data des
+# open http://localhost:8787
+```
+
+The image already sets `DATA_DIR=/data` and declares a `/data` volume, so accounts and
+friends persist across restarts.
+
+**Instant public URL (no account):** with the app running locally, expose it via a
+Cloudflare quick tunnel — `cloudflared tunnel --url http://localhost:8787` — which prints
+a temporary `https://…trycloudflare.com` link you can share with friends.
+
 ## Data & privacy
 
 - **Accounts** (name, username, email, bcrypt password hash), **synced state** and

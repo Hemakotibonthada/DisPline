@@ -1,0 +1,19 @@
+# Render.com blueprint — free Node web service.
+# One-click: https://render.com/deploy?repo=https://github.com/Hemakotibonthada/DisPline
+services:
+  - type: web
+    name: daily-execution-system
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true
+      - key: NODE_VERSION
+        value: "20"
+# Note: Render's free plan uses an ephemeral filesystem, so server/data.json
+# resets on each deploy/restart. For durable accounts + friends, use a paid
+# plan with a Disk mounted at /data and set DATA_DIR=/data, or point the store
+# at an external database.
