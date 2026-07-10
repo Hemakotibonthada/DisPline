@@ -1,4 +1,4 @@
-import { useStore } from '../../store/StoreContext.jsx';
+import { useStore } from '../../store/storeContext.js';
 import { ActivityRings } from './charts.jsx';
 import { disciplineScore, getDay } from '../../lib/discipline.js';
 import { todayKey } from '../../lib/dateUtils.js';

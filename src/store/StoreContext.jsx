@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { todayKey } from '../lib/dateUtils.js';
 import { normalizeDay, statusFromGoals } from '../lib/discipline.js';
 import { clamp } from '../lib/format.js';
@@ -12,9 +12,8 @@ import {
 import * as auth from './auth.js';
 import { categoryBreakdown, computeStats, dailyTrends } from './selectors.js';
 import { api, getToken } from '../api/client.js';
+import { StoreContext } from './storeContext.js';
 
-const StoreContext = createContext(null);
-export const useStore = () => useContext(StoreContext);
 
 const rid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-3);
 const clone = (x) => JSON.parse(JSON.stringify(x));
@@ -167,6 +166,7 @@ function ensureDailyMicro(draft) {
 export function StoreProvider({ user, setUser, onLogout, children }) {
   const [state, setState] = useState(() => loadState(user.id));
   const [toasts, setToasts] = useState([]);
+  const [syncStatus, setSyncStatus] = useState('local'); // local | saving | synced | offline
   const stateRef = useRef(state);
   stateRef.current = state;
 
@@ -177,14 +177,33 @@ export function StoreProvider({ user, setUser, onLogout, children }) {
     setState(loaded);
   }, [user.id]);
 
-  // Persist.
+  // Persist locally (debounced to avoid stringifying on every keystroke/toggle).
   useEffect(() => {
-    try {
-      localStorage.setItem(stateKey(user.id), JSON.stringify(state));
-    } catch (err) {
-      console.warn('store: persist failed', err);
-    }
+    const id = setTimeout(() => {
+      try {
+        localStorage.setItem(stateKey(user.id), JSON.stringify(state));
+      } catch (err) {
+        console.warn('store: persist failed', err);
+      }
+    }, 400);
+    return () => clearTimeout(id);
   }, [state, user.id]);
+
+  // Flush the latest state to localStorage when the tab is hidden/closed so the
+  // debounce never loses the final change.
+  useEffect(() => {
+    const flush = () => {
+      try {
+        localStorage.setItem(stateKey(user.id), JSON.stringify(stateRef.current));
+      } catch { /* ignore */ }
+    };
+    window.addEventListener('pagehide', flush);
+    document.addEventListener('visibilitychange', flush);
+    return () => {
+      window.removeEventListener('pagehide', flush);
+      document.removeEventListener('visibilitychange', flush);
+    };
+  }, [user.id]);
 
   // Theme + reduced motion.
   useEffect(() => {
@@ -249,8 +268,11 @@ export function StoreProvider({ user, setUser, onLogout, children }) {
           achievementsCount: Object.keys(snap.gamification?.achievements || {}).length,
           focusMinutes: stats.focusMinutes,
         };
-        api.putState({ state: snap, summary, trends: dailyTrends(snap, 30), categories: categoryBreakdown(snap) }).catch(() => {});
-      } catch { /* ignore */ }
+        api.putState({ state: snap, summary, trends: dailyTrends(snap, 30), categories: categoryBreakdown(snap) })
+          .then(() => setSyncStatus('synced'))
+          .catch(() => setSyncStatus('offline'));
+        setSyncStatus('saving');
+      } catch { setSyncStatus('offline'); }
     },
     [user.isGuest],
   );
@@ -258,8 +280,9 @@ export function StoreProvider({ user, setUser, onLogout, children }) {
   // Pull server state on login; seed the server if it has none.
   useEffect(() => {
     hydratedRef.current = false;
-    if (!getToken() || user.isGuest) { hydratedRef.current = true; return undefined; }
+    if (!getToken() || user.isGuest) { hydratedRef.current = true; setSyncStatus('local'); return undefined; }
     let cancelled = false;
+    setSyncStatus('saving');
     api
       .getState()
       .then((res) => {
@@ -273,8 +296,9 @@ export function StoreProvider({ user, setUser, onLogout, children }) {
           pushState(stateRef.current);
         }
         hydratedRef.current = true;
+        setSyncStatus('synced');
       })
-      .catch(() => { hydratedRef.current = true; });
+      .catch(() => { hydratedRef.current = true; setSyncStatus('offline'); });
     return () => { cancelled = true; };
   }, [user.id, user.isGuest, pushState]);
 
@@ -494,7 +518,7 @@ export function StoreProvider({ user, setUser, onLogout, children }) {
     return { stats, level: levelFromXp(stats.xp) };
   }, [state]);
 
-  const value = useMemo(() => ({ state, actions, derived, toasts, user }), [state, actions, derived, toasts, user]);
+  const value = useMemo(() => ({ state, actions, derived, toasts, user, syncStatus }), [state, actions, derived, toasts, user, syncStatus]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

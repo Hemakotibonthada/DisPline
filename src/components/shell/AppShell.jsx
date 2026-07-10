@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useStore } from '../../store/StoreContext.jsx';
+import { useStore } from '../../store/storeContext.js';
 import CommandPalette from '../common/CommandPalette.jsx';
 import Confetti from '../common/Confetti.jsx';
 import Avatar from '../common/Avatar.jsx';
@@ -48,8 +48,15 @@ function timeAgo(iso) {
 
 const NOTIF_ICON = { level: '⭐', achievement: '🏅', streak: '🔥', challenge: '🎯' };
 
+const SYNC = {
+  synced: { label: 'Synced', title: 'Your data is synced to the cloud' },
+  saving: { label: 'Saving…', title: 'Saving changes…' },
+  offline: { label: 'Offline', title: 'Server unreachable — changes are saved locally and will sync later' },
+  local: { label: 'Local', title: 'Guest mode — data is stored on this device only' },
+};
+
 export default function AppShell() {
-  const { state, actions, derived, toasts, user } = useStore();
+  const { state, actions, derived, toasts, user, syncStatus } = useStore();
   const [view, setView] = useState('today');
   const [notifOpen, setNotifOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -144,6 +151,10 @@ export default function AppShell() {
             <span>Execution</span>
           </div>
           <div className="topbar-spacer" />
+          <div className={`sync-chip ${syncStatus}`} title={(SYNC[syncStatus] || SYNC.local).title} role="status" aria-label={`Sync status: ${(SYNC[syncStatus] || SYNC.local).label}`}>
+            <span className="sync-dot" />
+            <span className="sync-label">{(SYNC[syncStatus] || SYNC.local).label}</span>
+          </div>
           <div className="tb-stats">
             <div className="stat-chip level">
               <span className="ic">⭐</span>

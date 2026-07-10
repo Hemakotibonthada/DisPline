@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { todayKey } from '../../lib/dateUtils.js';
-import { useStore } from '../../store/StoreContext.jsx';
+import { useStore } from '../../store/storeContext.js';
 import { CATEGORIES, JOURNAL_PROMPTS, pickDaily } from '../../store/defaults.js';
 
 const MOOD_FACES = ['😞', '😕', '😐', '🙂', '😄'];
@@ -42,10 +42,7 @@ export default function JournalView() {
 
   const dailyPrompt = useMemo(() => pickDaily(JOURNAL_PROMPTS, todayKey()), []);
   const journal = state.journal || [];
-  const totalWords = useMemo(
-    () => journal.reduce((sum, entry) => sum + (Number(entry.words) || 0), 0),
-    [journal],
-  );
+  const totalWords = journal.reduce((sum, entry) => sum + (Number(entry.words) || 0), 0);
   const selectedTags = splitTags(tagText).map((tag) => tag.toLowerCase());
   const canSave = content.trim().length > 0;
 

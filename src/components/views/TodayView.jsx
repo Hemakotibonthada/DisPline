@@ -4,7 +4,7 @@ import FocusBoard from '../FocusBoard.jsx';
 import HabitChain from '../HabitChain.jsx';
 import MetricLogs from '../MetricLogs.jsx';
 import DailyActivity from '../common/DailyActivity.jsx';
-import { useStore } from '../../store/StoreContext.jsx';
+import { useStore } from '../../store/storeContext.js';
 import {
   currentStreak,
   disciplineScore,

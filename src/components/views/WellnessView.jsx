@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { formatShortDate, lastNDays, shortWeekday, todayKey } from '../../lib/dateUtils.js';
-import { useStore } from '../../store/StoreContext.jsx';
+import { useStore } from '../../store/storeContext.js';
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const avg = (items) => {

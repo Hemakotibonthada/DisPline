@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Ring from '../common/Ring.jsx';
-import { useStore } from '../../store/StoreContext.jsx';
+import { useStore } from '../../store/storeContext.js';
 import { formatClock, formatDuration } from '../../lib/format.js';
 import { CATEGORY_LIST, CATEGORIES } from '../../store/defaults.js';
 

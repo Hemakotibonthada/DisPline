@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import { useStore } from '../../store/StoreContext.jsx';
+import { useStore } from '../../store/storeContext.js';
 import { ACHIEVEMENTS, CHALLENGES, CATEGORIES, MILESTONES } from '../../store/defaults.js';
-import { activityHeatmap, categoryBreakdown, localLeaderboard } from '../../store/selectors.js';
+import { activityHeatmap, categoryBreakdown } from '../../store/selectors.js';
 import Trends from '../common/Trends.jsx';
 
 const heatClass = (count) => {
@@ -25,12 +25,11 @@ const challengeProgress = (challenge, stats, categories) => {
 };
 
 export default function ProgressView() {
-  const { state, derived, actions, user } = useStore();
+  const { state, derived, actions } = useStore();
   const stats = derived.stats;
   const level = derived.level;
   const categories = useMemo(() => categoryBreakdown(state), [state]);
   const heat = useMemo(() => activityHeatmap(state, 119), [state]);
-  const leaderboard = useMemo(() => localLeaderboard(), [state, user.id]);
 
   const categoryList = Object.values(CATEGORIES);
   const maxCategory = Math.max(0, ...categoryList.map((category) => categories[category.id] || 0));
@@ -241,35 +240,18 @@ export default function ProgressView() {
 
           <div className="panel panel-p">
             <div className="section-h">
-              <h3>Leaderboard</h3>
-              <span className="hint">this device</span>
+              <h3>Highlights</h3>
+              <span className="hint">lifetime</span>
             </div>
-            {leaderboard.length === 0 ? (
-              <div className="empty">No local leaderboard data yet.</div>
-            ) : (
-              <div className="leaderboard">
-                {leaderboard.map((row, index) => {
-                  const isMe = row.id === user.id;
-                  return (
-                    <div className={`lb-row${isMe ? ' me' : ''}`} key={row.id}>
-                      <div className={`lb-rank${index < 3 ? ' top' : ''}`}>#{index + 1}</div>
-                      <div className="avatar sm" style={{ background: row.avatarColor }}>
-                        {(row.name || '?')[0]}
-                      </div>
-                      <div>
-                        <div className="lb-name">
-                          {row.name}{isMe ? ' (you)' : ''}
-                        </div>
-                        <div className="lb-meta">
-                          Lv {row.level} · {row.streak}🔥
-                        </div>
-                      </div>
-                      <div className="lb-xp">{row.xp} XP</div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+            <div className="grid g2">
+              <div className="statcard"><div className="sc-top">🎯 Focus sessions</div><div className="sc-v num">{stats.focusSessions}</div></div>
+              <div className="statcard"><div className="sc-top">⏱ Focus minutes</div><div className="sc-v num">{stats.focusMinutes}</div></div>
+              <div className="statcard"><div className="sc-top">⚡ Micro-actions</div><div className="sc-v num">{stats.microDone}</div></div>
+              <div className="statcard"><div className="sc-top">📝 Journal entries</div><div className="sc-v num">{stats.journals}</div></div>
+              <div className="statcard"><div className="sc-top">🔁 Habits tracked</div><div className="sc-v num">{stats.habitsCount}</div></div>
+              <div className="statcard"><div className="sc-top">✨ Perfect days</div><div className="sc-v num">{stats.perfectDays}</div></div>
+            </div>
+            <div className="hint" style={{ marginTop: 12 }}>Compare with friends in the Friends tab →</div>
           </div>
         </section>
       </div>

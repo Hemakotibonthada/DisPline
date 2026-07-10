@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { api } from '../../api/client.js';
 import { CATEGORIES } from '../../store/defaults.js';
 import { Donut, LineChart } from '../common/charts.jsx';
@@ -554,15 +554,13 @@ function ProgressModal({ friend, progress, loading, error, busy, onClose, onUnfr
 
   const labels = trends.map((trend) => shortDate(trend.date));
   const actionMax = Math.max(1, ...trends.map((trend) => trend.actions || 0));
-  const categorySegments = useMemo(() => (
-    Object.entries(categories)
-      .map(([id, value]) => ({
-        label: CATEGORIES[id]?.label || id,
-        value,
-        color: CATEGORIES[id]?.color || 'var(--brand)',
-      }))
-      .filter((segment) => segment.value > 0)
-  ), [categories]);
+  const categorySegments = Object.entries(categories)
+    .map(([id, value]) => ({
+      label: CATEGORIES[id]?.label || id,
+      value,
+      color: CATEGORIES[id]?.color || 'var(--brand)',
+    }))
+    .filter((segment) => segment.value > 0);
   const categoryTotal = categorySegments.reduce((total, segment) => total + segment.value, 0);
 
   return (

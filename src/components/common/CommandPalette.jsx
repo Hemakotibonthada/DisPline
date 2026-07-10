@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useStore } from '../../store/StoreContext.jsx';
+import { useStore } from '../../store/storeContext.js';
 
 export default function CommandPalette({ open, onClose, onNavigate }) {
   const { actions } = useStore();

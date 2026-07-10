@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AVATAR_COLORS, REWARDS, THEMES } from '../../store/defaults.js';
-import { useStore } from '../../store/StoreContext.jsx';
+import { useStore } from '../../store/storeContext.js';
 import Avatar from '../common/Avatar.jsx';
 import { resizeImageToDataUrl } from '../../lib/image.js';
 

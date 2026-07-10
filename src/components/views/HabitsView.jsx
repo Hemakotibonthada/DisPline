@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useStore } from '../../store/StoreContext.jsx';
+import { useStore } from '../../store/storeContext.js';
 import { CATEGORIES, CATEGORY_LIST, HABIT_TEMPLATES } from '../../store/defaults.js';
 import { addDays, lastNDays, shortWeekday, todayKey } from '../../lib/dateUtils.js';
 

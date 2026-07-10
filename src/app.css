@@ -507,3 +507,26 @@ textarea.input { resize: vertical; min-height: 84px; line-height: 1.5; }
 
 .social-empty { text-align: center; padding: 30px 16px; color: var(--text-faint); }
 .social-empty .big { font-size: 34px; margin-bottom: 8px; opacity: 0.7; }
+
+/* =====================================================================
+   PRO POLISH — sync status, error screen, focus visibility
+   ===================================================================== */
+.sync-chip { display: inline-flex; align-items: center; gap: 7px; padding: 6px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface-2); font-size: 11px; font-weight: 700; color: var(--text-muted); flex: none; }
+.sync-chip .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-faint); flex: none; }
+.sync-chip.synced .sync-dot { background: var(--g-green); box-shadow: 0 0 8px var(--g-green); }
+.sync-chip.saving .sync-dot { background: var(--amber-bright); animation: pulseDot 1.1s ease-in-out infinite; }
+.sync-chip.offline { color: var(--red-bright); border-color: rgba(239, 68, 68, 0.4); }
+.sync-chip.offline .sync-dot { background: var(--red-bright); }
+@media (max-width: 760px) { .sync-chip .sync-label { display: none; } .sync-chip { padding: 7px; } }
+
+.crash { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; padding: 20px; }
+.crash-card { max-width: 440px; width: 100%; padding: 30px; text-align: center; }
+.crash-ic { font-size: 40px; margin-bottom: 8px; }
+.crash-card h1 { font-size: 20px; margin: 0 0 8px; }
+.crash-card p { color: var(--text-muted); font-size: 13.5px; margin: 0 0 18px; }
+.crash-actions { display: flex; gap: 10px; justify-content: center; }
+.crash-detail { margin-top: 18px; text-align: left; font-size: 11px; color: var(--text-faint); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; overflow: auto; max-height: 120px; white-space: pre-wrap; }
+
+/* Keyboard focus visibility (mouse clicks stay clean via :focus-visible). */
+:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 4px; }
+button:focus:not(:focus-visible), input:focus:not(:focus-visible), select:focus:not(:focus-visible), textarea:focus:not(:focus-visible) { outline: none; }

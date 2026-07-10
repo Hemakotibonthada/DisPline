@@ -1,4 +1,4 @@
-import { useStore } from '../../store/StoreContext.jsx';
+import { useStore } from '../../store/storeContext.js';
 import { categoryBreakdown, dailyTrends } from '../../store/selectors.js';
 import { CATEGORIES } from '../../store/defaults.js';
 import { keyToDate } from '../../lib/dateUtils.js';
